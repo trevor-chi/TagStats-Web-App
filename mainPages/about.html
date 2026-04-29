@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TagStats - About The Creator</title>
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/theme.css" rel="stylesheet">
+
+    <style>
+        html, body {
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: url('../images/background/stadiumBackground.jpg') center/cover no-repeat;
+            filter: brightness(1);
+            z-index: -1;
+        }
+
+        body {
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header.header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .headshot-frame {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid var(--team-color, #ff2d2d);
+            overflow: hidden;
+            margin: 0 auto 15px;
+            position: relative;
+        }
+
+        .headshot {
+            width: auto;
+            height: 100%;
+            min-width: 100%;
+            object-fit: cover;
+            object-position: 50% 50%;
+            display: block;
+        }
+
+        .creator-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--team-color, #ff2d2d);
+        }
+
+        .creator-title {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: var(--team-color);
+        }
+
+        section.bio, section.contact {
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        section.bio h2, section.contact h2 {
+            text-align: center;
+            color: var(--team-color, #ff2d2d);
+            margin-bottom: 15px;
+        }
+
+        section.bio p, section.contact p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .social-links {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .social-links a {
+            color: var(--team-color, #ff2d2d);
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .social-links a:hover {
+            opacity: 0.8;
+        }
+
+        #backBtn {
+            display: block;
+            background: var(--team-color, #ff2d2d);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+            margin: 10px auto 30px auto;
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        #backBtn:hover {
+            opacity: 0.85;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <div class="headshot-frame">
+                <img src="../images/creatorHeadshot/headshot.jpeg" alt="Creator Headshot" class="headshot">
+            </div>
+            <h1 class="creator-name">Trevor Childers</h1>
+            <p class="creator-title">Creator & Developer of TagStats</p>
+        </header>
+
+        <section class="bio">
+            <h2>About Me</h2>
+            <p>Hi, I'm Trevor Childers, the creator behind TagStats. I'm currently a senior majoring in Creative
+                Technologies and Computer Science at Berry College in Rome, GA. I've played baseball for fifteen years
+                and collected cards for most of my life.</p>
+            <p>While collecting cards, I always sensed there was more potential waiting to be unlocked. After diving
+                into various technologies through my education, I knew I wanted to blend my passion for baseball with my
+                love for technology, and thus TagStats was born.</p>
+        </section>
+
+        <section class="contact">
+            <h2>Get in Touch</h2>
+            <p>Have questions, feedback, or ideas? I'd love to hear from you!</p>
+            <ul class="social-links">
+                <li><a href="https://www.linkedin.com/in/trevor-childers-152945335/" target="_blank">LinkedIn</a></li>
+                <li><a href="mailto:childerstrevor10@gmail.com">Email</a></li>
+                <li><a href="https://github.com/trevor-chi" target="_blank">GitHub</a></li>
+            </ul>
+        </section>
+
+        <button id="backBtn">Back to TagStats</button>
+
+    </div>
+
+    <script>
+    // color map for players
+    const playerTeamColors = {
+        ohtansh01: "#005A9C", acunaro01: "#CE1141", martipe02: "#BD3039",
+        riverma01: "#003087", griffke02: "#005DAA", maddugr01: "#0E3386",
+        jonesch06: "#CE1141", poseybu01: "#FD5A1E", bondsba01: "#FD5A1E",
+        pujolal01: "#C41E3A"
+    };
+
+    // set team color from query param
+    const params = new URLSearchParams(window.location.search);
+    const player = params.get("player");
+    if (player && playerTeamColors[player]) {
+        document.documentElement.style.setProperty("--team-color", playerTeamColors[player]);
+    }
+
+    // back button
+    document.getElementById('backBtn').addEventListener('click', () => {
+        const lastPage = sessionStorage.getItem('lastPage');
+        if (lastPage) {
+            window.location.href = lastPage;
+        } else {
+            window.history.back();
+        }
+    });
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TagStats - Login</title>
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/theme.css" rel="stylesheet">
+
+    <style>
+        /* transparent inputs */
+        .form-floating .form-control {
+            background: transparent !important;
+            color: white !important;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: none !important;
+            font-size: 16px;
+        }
+
+        .form-floating .form-control:focus {
+            background: transparent !important;
+            color: white !important;
+            border-color: var(--team-color, #ff2d2d);
+            box-shadow: none !important;
+        }
+
+        .form-floating label {
+            color: white !important;
+        }
+
+        .form-floating>label::after {
+            background-color: transparent !important;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-control:-webkit-autofill,
+        .form-control:-webkit-autofill:hover,
+        .form-control:-webkit-autofill:focus,
+        .form-control:-webkit-autofill:active {
+            -webkit-text-fill-color: #fff !important;
+            -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+            box-shadow: 0 0 0 1000px transparent inset !important;
+            transition: background-color 9999s ease-out 0s;
+            caret-color: #fff;
+        }
+
+        .site-footer {
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            background: none !important;
+            position: relative;
+            z-index: 10;
+        }
+
+        .site-footer .footer-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: underline;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .site-footer {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .unlock-card {
+                padding: 30px 15px;
+            }
+
+            .player-name {
+                font-size: 1.7rem;
+            }
+
+            .unlock-btn {
+                font-size: 1rem;
+                padding: 12px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <img id="playerBackground" src="" alt="Player Background" class="bg-player-img">
+
+    <div class="content-wrapper">
+
+        <div class="brand-title">
+            TAGSTATS
+        </div>
+
+        <div class="unlock-card">
+
+            <div class="player-name">
+                Log In
+            </div>
+
+            <p class="activated-text">
+                Enter your credentials to access your profile.
+            </p>
+
+            <div id="loginErrorBanner" class="alert alert-danger d-none" role="alert">
+                Incorrect email or password. Please try again.
+            </div>
+
+            <form action="logCheck.php" method="post">
+                <input type="hidden" id="playerField" name="player" value="">
+                <input type="hidden" id="typeField" name="type" value="">
+
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="tryEmail" name="tryEmail" placeholder="Email" required>
+                    <label for="tryEmail">Email</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="tryPass" name="tryPass" placeholder="Password"required>
+                    <label for="tryPass">Password</label>
+                </div>
+
+                <button class="unlock-btn" type="submit">Submit</button>
+            </form>
+
+        </div>
+
+        <div>
+            <span class="secondary-link">New to TagStats? </span>
+            <a id="registerLink" href="../userRegistration/register.html" class="secondary-link">Create Account</a>
+        </div>
+
+        <footer class="site-footer" id="siteFooter">
+            <a id="footerLink" href="../mainPages/about.html" class="footer-link">
+                Created By Trevor Childers - 2026
+            </a>
+        </footer>
+
+        <script>
+            // get url parameters
+            const params = new URLSearchParams(window.location.search);
+            const player = params.get("player") || "";
+            const type = params.get("type") || "";
+            const hasError = params.get("error") === "1" || params.get("errorid") === "1";
+
+            // define document elements
+            const bg = document.getElementById("playerBackground");
+            const registerLink = document.getElementById("registerLink");
+            const errorBanner = document.getElementById("loginErrorBanner");
+            const playerField = document.getElementById("playerField");
+            const typeField = document.getElementById("typeField");
+
+            // set player and type query params to pass after login
+            if (playerField) playerField.value = player;
+            if (typeField) typeField.value = type;
+
+            // show error banner if login failed
+            if (errorBanner && hasError) {
+                errorBanner.classList.remove("d-none");
+            }
+
+            // preserve query params on register link
+            if (registerLink) {
+                const url = new URL(registerLink.getAttribute("href"), window.location.href);
+                if (player) url.searchParams.set("player", player);
+                if (type) url.searchParams.set("type", type);
+                registerLink.href = url.pathname + url.search;
+            }
+
+            // preserve query params on footer link
+            const footerLink = document.getElementById("footerLink");
+            if (footerLink) {
+                const url = new URL(footerLink.getAttribute("href"), window.location.href);
+                if (player) url.searchParams.set("player", player);
+                if (type) url.searchParams.set("type", type);
+                footerLink.href = url.pathname + url.search;
+            }
+
+            // player data for background image and team color
+            const playerData = {
+                "ohtansh01": { img: "../images/action/shoheiAction.png", translateY: "-50%", scale: 1.0, color: "#005A9C" },
+                "acunaro01": { img: "../images/action/acunaAction.png", translateY: "-50%", scale: 1.00, color: "#CE1141" },
+                "martipe02": { img: "../images/action/martinezAction.png", translateY: "-50%", scale: 1.00, color: "#BD3039" },
+                "riverma01": { img: "../images/action/riveraAction.png", translateY: "-50%", scale: 1.00, color: "#003087" },
+                "griffke02": { img: "../images/action/griffeyAction.png", translateY: "-50%", scale: 1.00, color: "#005DAA" },
+                "maddugr01": { img: "../images/action/madduxAction.png", translateY: "-50%", scale: 1.00, color: "#0E3386" },
+                "jonesch06": { img: "../images/action/chipperAction.png", translateY: "-50%", scale: 1.00, color: "#CE1141" },
+                "poseybu01": { img: "../images/action/poseyAction.png", translateY: "-50%", scale: 1.00, color: "#FD5A1E" },
+                "bondsba01": { img: "../images/action/bondsAction.png", translateY: "-50%", scale: 1.00, color: "#FD5A1E" },
+                "pujolal01": { img: "../images/action/pujolsAction.png", translateY: "-50%", scale: 1.00, color: "#C41E3A" }
+            };
+
+            // apply player specific background and team color
+            if (player && playerData[player]) {
+                const pdata = playerData[player];
+                bg.src = pdata.img;
+                bg.style.transform = `translate(-50%, ${pdata.translateY}) scale(${pdata.scale || 1})`;
+                document.documentElement.style.setProperty("--team-color", pdata.color);
+            }
+        </script>
+        <script src="js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

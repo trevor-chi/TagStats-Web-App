@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style>
+    .site-footer {
+        color: rgba(255, 255, 255, 0.6);
+        text-align: center;
+        font-size: 0.9rem;
+        background: none !important;
+        position: relative;
+        z-index: 10;
+        margin-top: 10px;
+    }
+
+    .site-footer .footer-link {
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: underline;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .site-footer .footer-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TagStats</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/theme.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <img id="bgPlayerImg" class="bg-player-img" src="" alt="Player Background">
+
+    <div class="content-wrapper">
+
+        <div class="brand-title">
+            TAGSTATS
+        </div>
+
+        <div class="unlock-card" id="unlockCard">
+
+            <div class="player-name" id="playerTitle">
+                CARD ACTIVATED
+            </div>
+
+            <div class="activated-text" id="activatedText">
+                EXCLUSIVE ANALYTICS UNLOCKED
+            </div>
+
+            <p class="mt-3 text-secondary" id="playerMessage">
+                Log in to access full advanced metrics.
+            </p>
+
+        </div>
+
+        <div class="d-grid">
+            <a id="loginBtn" href="../login/login.html" class="btn unlock-btn">
+                UNLOCK PLAYER →
+            </a>
+        </div>
+
+        <div>
+            <span class="secondary-link">New to TagStats?</span>
+            <a id="createAccountLink" href="../userRegistration/register.html" class="secondary-link">
+                Create Account
+            </a>
+        </div>
+
+        <footer class="site-footer" id="siteFooter">
+            <a id="footerLink" href="../mainPages/about.html" class="footer-link">
+                Created By Trevor Childers - 2026
+            </a>
+        </footer>
+    </div>
+
+    <script>
+        // player data: name, image, team color, and background image position
+        const players = {
+            "ohtansh01": { name: "Shohei Ohtani", image: "../images/action/shoheiAction.png", color: "#005A9C", translate: "-50%" },
+            "acunaro01": { name: "Ronald Acuña Jr.", image: "../images/action/acunaAction.png", color: "#CE1141", translate: "-50%" },
+            "martipe02": { name: "Pedro Martínez", image: "../images/action/martinezAction.png", color: "#BD3039", translate: "-50%" },
+            "riverma01": { name: "Mariano Rivera", image: "../images/action/riveraAction.png", color: "#003087", translate: "-50%" },
+            "griffke02": { name: "Ken Griffey Jr.", image: "../images/action/griffeyAction.png", color: "#005DAA", translate: "-50%" },
+            "maddugr01": { name: "Greg Maddux", image: "../images/action/madduxAction.png", color: "#0E3386", translate: "-50%" },
+            "jonesch06": { name: "Chipper Jones", image: "../images/action/chipperAction.png", color: "#CE1141", translate: "-50%" },
+            "poseybu01": { name: "Buster Posey", image: "../images/action/poseyAction.png", color: "#FD5A1E", translate: "-50%" },
+            "bondsba01": { name: "Barry Bonds", image: "../images/action/bondsAction.png", color: "#FD5A1E", translate: "-50%" },
+            "pujolal01": { name: "Albert Pujols", image: "../images/action/pujolsAction.png", color: "#C41E3A", translate: "-50%" }
+        };
+
+        // get url query parameters
+        const params = new URLSearchParams(window.location.search);
+        const player = params.get("player") || "";
+        const type = params.get("type") || "";
+
+        // helper function to update link with player and type query params
+        function updateLink(link) {
+            if (!link) return;
+            const url = new URL(link.getAttribute("href"), window.location.href);
+            if (player) url.searchParams.set("player", player);
+            if (type) url.searchParams.set("type", type);
+            link.href = url.pathname + url.search;
+        }
+
+        // check if player exists
+        if (player && players[player]) {
+            const p = players[player];
+
+            // update player name, message, and text color
+            document.getElementById("playerTitle").innerText = p.name;
+            document.getElementById("playerMessage").innerText = `log in to unlock ${p.name}'s full analytics profile.`;
+            document.getElementById("activatedText").style.color = p.color;
+
+            // set background image and its position
+            const bgImg = document.getElementById("bgPlayerImg");
+            bgImg.src = p.image;
+            bgImg.style.transform = `translate(-50%, ${p.translate})`;
+
+            // apply team color to elements and update login button link to retain query params
+            document.documentElement.style.setProperty('--team-color', p.color);
+            document.getElementById("loginBtn").style.background = p.color;
+            document.getElementById("loginBtn").href = `../login/login.html?player=${player}${type ? '&type=' + type : ''}`;
+
+            // update links with params
+            updateLink(document.getElementById("createAccountLink"));
+            updateLink(document.getElementById("footerLink"));
+        }
+    </script>
+</body>
+
+</html>

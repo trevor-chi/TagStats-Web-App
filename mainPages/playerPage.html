@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TagStats - Player Stats</title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-family: 'Roboto', sans-serif;
+      background:
+        linear-gradient(to bottom, #1c1c1c, #2b2b2b),
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05), transparent 40%);
+      color: white;
+    }
+
+    body.modal-open .content-wrapper {
+      filter: blur(6px);
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .content-wrapper {
+      height: 100vh;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      padding: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .player-hero {
+      flex: 0 0 18vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 100%;
+      background: linear-gradient(to bottom, var(--team-color, #ff2d2d), #1c1c1c);
+      border-radius: 1.2vw;
+      padding: 1.3vw 1vw 1vw;
+      margin-bottom: 1vh;
+      box-sizing: border-box;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .player-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0));
+      pointer-events: none;
+    }
+
+    .hero-content {
+      display: flex;
+      align-items: center;
+      gap: 2vw;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    #player-photo {
+      width: 25vw;
+      height: 135px;
+      min-width: 80px;
+      aspect-ratio: 1 / 1;
+      border-radius: 1vw;
+      border: 0.5vw solid white;
+      object-fit: cover;
+      transition: transform .2s ease;
+      box-shadow: 0 0 18px var(--team-color);
+    }
+
+    #player-photo:hover {
+      transform: scale(1.05);
+    }
+
+    .player-meta {
+      flex: 1;
+      padding-top: 0.7vh;
+    }
+
+    #player-name {
+      font-size: calc(1.5rem + 1vw);
+      margin: 0;
+    }
+
+    .player-highlights {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5vw 1vw;
+      margin-top: 2%;
+    }
+
+    .player-highlights span {
+      background: rgba(0, 0, 0, 0.45);
+      padding: 0.5vw 1vw;
+      border-radius: 999px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.9rem;
+    }
+
+    .bio-card,
+    .chart-card {
+      background: linear-gradient(145deg,
+          color-mix(in srgb, var(--team-color) 35%, #0b0f1a),
+          #0b0f1a);
+      border: 1px solid color-mix(in srgb, var(--team-color) 45%, transparent);
+      border-radius: 1.2vw;
+      box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.35),
+        0 0 16px color-mix(in srgb, var(--team-color) 40%, transparent);
+      box-sizing: border-box;
+    }
+
+    .bio-card {
+      flex: 0 0 auto;
+      width: 100%;
+      max-height: 15vh;
+      overflow-y: auto;
+      padding: 1.5vw;
+      margin-bottom: 1vh;
+      font-size: calc(0.9rem + 0.5vw);
+      line-height: 1.4rem;
+    }
+
+    #bio-text {
+      text-align: center;
+      padding: 0 2vw;
+    }
+
+    #tabs {
+      flex: 0 0 auto;
+      display: flex;
+      gap: 0.5vw;
+      margin-bottom: 1vh;
+      width: 100%;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 1vw;
+      border-radius: 0.6vw;
+      border: none;
+      background: #2b2b2b;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: calc(0.9rem + 0.3vw);
+      transition: all .2s ease;
+    }
+
+    .tab-btn:hover {
+      background: #3a3a3a;
+    }
+
+    .tab-btn.active {
+      background: var(--team-color, #ff2d2d);
+      transform: translateY(-1px);
+    }
+
+    .tab-content {
+      display: none;
+      width: 100%;
+      animation: fadeIn .25s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    #table-tab {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 0;
+      min-height: 0;
+      height: 0;
+    }
+
+    .table-container {
+      flex: 1 1 auto;
+      min-height: 0;
+      height: 100%;
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: auto;
+      background: linear-gradient(145deg, rgba(45, 45, 45, 0.95), rgba(20, 20, 20, 0.95));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      border-radius: 1.2vw;
+    }
+
+    .table-container::-webkit-scrollbar {
+      height: 8px;
+      width: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: #1c1c1c;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: var(--team-color);
+      border-radius: 10px;
+    }
+
+    #stats-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #stats-table th,
+    #stats-table td {
+      padding: 2vw;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    #stats-table th {
+      background: var(--team-color, #ff2d2d);
+    }
+
+    #stats-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    #stats-table tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    #stats-table tr:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    #stats-table tr.best-season {
+      background: color-mix(in srgb, var(--team-color) 55%, rgba(0, 0, 0, 0.2));
+      box-shadow: inset 0 0 0 3px var(--team-color), 0 0 16px color-mix(in srgb, var(--team-color) 70%, transparent);
+      font-weight: 800;
+    }
+
+    #stats-table tr.best-season:hover {
+      background: color-mix(in srgb, var(--team-color) 65%, rgba(0, 0, 0, 0.2));
+    }
+
+    .totals-row {
+      background: rgba(255, 255, 255, 0.12);
+      font-weight: 700;
+      border-top: 2px solid var(--team-color);
+    }
+
+    #chart-tab {
+      display: none;
+      flex: 1 1 0;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 0;
+      width: 100%;
+      overflow-y: auto;
+      padding-bottom: 12px;
+    }
+
+    .chart-card {
+      padding: 12px;
+      margin-bottom: 20px;
+    }
+
+    #chart-tab canvas,
+    #radar-chart,
+    #stats-chart {
+      display: block;
+      width: 100%;
+      height: 320px;
+      border-radius: 1vw;
+    }
+
+    .container,
+    .container-fluid {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
+    /* highlights tab */
+    #highlights-tab {
+      display: none;
+      flex: 1 1 0;
+      min-height: 0;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .video-wrap {
+      width: 95%;
+      aspect-ratio: 3 / 3;
+      max-height: 100%;
+      height: 100%;
+      border-radius: 1vw;
+      overflow: hidden;
+      position: relative;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .video-wrap.is-loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .video-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      aspect-ratio: 3 / 3;
+    }
+
+    .profile-link {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 55px;
+      background: transparent;
+      border: none;
+      text-decoration: none;
+      z-index: 10;
+    }
+
+    .profile-link img {
+      width: 53px;
+      height: 53px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.65);
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    .profile-text {
+      font-size: 10px;
+      color: white;
+      letter-spacing: 0.5px;
+      margin-top: -4px;
+    }
+
+    .two-way-link {
+      display: inline-block;
+      margin-top: 0;
+      font-size: 0.85rem;
+      color: #fff;
+      text-decoration: underline;
+      opacity: 0.85;
+    }
+
+    .two-way-link:hover {
+      opacity: 1;
+    }
+
+    @media (max-width: 1000px) {
+      #player-photo {
+        width: 25vw;
+      }
+
+      #player-name {
+        font-size: calc(1.2rem + 1.5vw);
+      }
+
+      .player-highlights {
+        font-size: calc(0.85rem + 0.5vw);
+      }
+
+      .bio-card {
+        font-size: calc(0.85rem + 0.5vw);
+        line-height: 1.4rem;
+      }
+
+      .tab-btn {
+        font-size: calc(0.85rem + 0.5vw);
+        padding: 1vw;
+      }
+    }
+
+    .auth-modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 9999;
+    }
+
+    .auth-modal[hidden] {
+      display: none;
+    }
+
+    .auth-card {
+      background: #1f1f1f;
+      color: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      max-width: 420px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      border: 1px solid color-mix(in srgb, var(--team-color, #ff2d2d) 40%, transparent);
+    }
+
+    .auth-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .auth-actions button {
+      padding: 6px 12px;
+      border-radius: 10px;
+      border: 1px solid color-mix(in srgb, var(--team-color, #ff2d2d) 65%, transparent);
+      background: color-mix(in srgb, var(--team-color, #ff2d2d) 85%, #000);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+      white-space: nowrap;
+      font-size: clamp(1.2rem, 1.5vw, 0.95rem);
+      min-width: 0;
+    }
+
+    .auth-actions button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .auth-actions button:active {
+      transform: translateY(0);
+    }
+
+    .tagstats-link {
+      margin-top: 12px;
+      display: inline-block;
+      font-size: 0.85rem;
+      color: #fff;
+      text-decoration: underline;
+      cursor: pointer;
+      opacity: 0.9;
+    }
+
+    .tagstats-link:hover {
+      opacity: 1;
+    }
+
+    .site-footer {
+      color: rgba(255, 255, 255, 0.6);
+      text-align: center;
+      font-size: 0.9rem;
+      background: none !important;
+      position: relative;
+    }
+
+    .site-footer .footer-link {
+      color: rgba(255, 255, 255, 0.6);
+      text-decoration: underline;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .site-footer .footer-link:hover {
+      text-decoration: underline;
+    }
+
+    #stat-type-subtitle {
+      font-size: 0.95rem;
+      font-weight: 500;
+      opacity: 0.85;
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- profile shortcut -->
+  <a class="profile-link" href="../mainPages/profile.html" title="My Profile">
+    <img id="profile-icon" src="../images/logos/default.png" alt="Profile" />
+    <span class="profile-text">Profile</span>
+  </a>
+
+  <div class="content-wrapper">
+    <!-- player hero section -->
+    <div class="player-hero">
+      <div class="hero-content">
+        <img id="player-photo" src="" alt="Player headshot" />
+        <div class="player-meta">
+          <h1 id="player-name"></h1>
+          <div id="stat-type-subtitle"></div>
+          <div class="player-highlights">
+            <span id="stat1"></span>
+            <span id="stat2"></span>
+            <span id="stat3"></span>
+            <span id="stat4"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- player bio -->
+    <div class="bio-card">
+      <p id="bio-text"></p>
+    </div>
+
+    <!-- tab buttons -->
+    <div id="tabs">
+      <button class="tab-btn active" data-tab="table-tab">Table</button>
+      <button class="tab-btn" data-tab="chart-tab">Charts</button>
+      <button class="tab-btn" data-tab="highlights-tab">Highlights</button>
+    </div>
+
+    <!-- stats table -->
+    <div class="tab-content" id="table-tab">
+      <div class="table-container">
+        <table id="stats-table">
+          <thead>
+            <tr id="stats-headers"></tr>
+          </thead>
+          <tbody id="stats-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- charts -->
+    <div class="tab-content" id="chart-tab">
+      <div class="chart-card">
+        <canvas id="radar-chart"></canvas>
+      </div>
+      <div class="chart-card">
+        <canvas id="stats-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- highlight video -->
+    <div class="tab-content" id="highlights-tab">
+      <div class="video-wrap">
+        <iframe id="highlights-iframe" title="Player highlights" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- radar chart category info popup -->
+  <div id="category-info-modal" class="auth-modal" hidden>
+    <div class="auth-card">
+      <h2 id="category-title"></h2>
+      <p id="category-explanation"></p>
+      <div class="auth-actions">
+        <button onclick="document.getElementById('category-info-modal').hidden = true; document.body.classList.remove('modal-open');">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- login/signup popup -->
+  <div id="auth-modal" class="auth-modal" hidden>
+    <div class="auth-card">
+      <h2>Save Your Collection?</h2>
+      <p>Login or create an account to save cards to your collection. Or continue as a guest.</p>
+      <div class="auth-actions">
+        <button id="auth-login">Log In</button>
+        <button id="auth-signup">Create Account</button>
+        <button id="auth-guest">Continue as Guest</button>
+      </div>
+
+      <a href="whatIsTagStats.html" target="_blank" class="tagstats-link">
+        What Is TagStats?
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // check whether the user has a valid userID cookie
+    function hasUserCookie() {
+      return document.cookie.split('; ').some(c => c.trim().startsWith('userID='));
+    }
+
+    // show the auth popup for guests
+    function showAuthPrompt() {
+      const modal = document.getElementById('auth-modal');
+      modal.hidden = false;
+      document.body.classList.add('modal-open');
+
+      document.getElementById('auth-login').onclick = () => {
+        window.location.href = `../login/login.html${location.search}`;
+      };
+      document.getElementById('auth-signup').onclick = () => {
+        window.location.href = `../userRegistration/register.html${location.search}`;
+      };
+      document.getElementById('auth-guest').onclick = () => {
+        modal.hidden = true;
+        document.body.classList.remove('modal-open');
+      };
+    }
+
+    // decide whether the user is logged in, a guest, or should be redirected to the homepage if their cookie is invalid
+    async function authGate() {
+      const hasCookie = hasUserCookie();
+
+      if (!hasCookie) {
+        showAuthPrompt();
+        return { status: 'guest' };
+      }
+
+      const res = await fetch('../api/profile_get.php', { cache: 'no-store' });
+      if (!res.ok) {
+        window.location.href = `home.html${location.search}`;
+        return { status: 'redirect' };
+      }
+
+      return { status: 'logged-in' };
+    }
+
+    (async () => {
+      const auth = await authGate();
+      if (auth.status === 'redirect') return;
+
+      const isGuest = auth.status === 'guest';
+
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      let statsChart = null;
+      let radarChart = null;
+      let statsData = null;
+      let radarData = null;
+      let chartsReady = false;
+      let chartsPending = false;
+      let highlightsLoaded = false;
+
+      // handle tab switching between table, charts, and highlights
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const tabId = btn.dataset.tab;
+          document.querySelectorAll('.tab-content').forEach(tc => {
+            tc.style.display = 'none';
+          });
+
+          const target = document.getElementById(tabId);
+          target.style.display = (tabId === 'table-tab' || tabId === 'highlights-tab') ? 'flex' : 'block';
+
+          if (tabId === 'chart-tab') {
+            ensureCharts();
+          }
+          if (tabId === 'highlights-tab') {
+            loadHighlights();
+          }
+        });
+      });
+
+      // get the player and type query params from the URL
+      function getQueryParam(name) {
+        return new URLSearchParams(location.search).get(name);
+      }
+
+      const player = getQueryParam('player');
+      const type = getQueryParam('type');
+
+      // preserve current query params when the  profile link is clicked
+      const profileLink = document.querySelector('.profile-link');
+      if (profileLink) {
+        profileLink.href = `../mainPages/profile.html${location.search}`;
+      }
+
+      // update collection only for logged-in users
+      if (!isGuest) {
+        fetch('/pink/tchilders/tagStats/api/colUp.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ player_id: player })
+        });
+      }
+
+      // update auth popup "what is tagstats?" link to preserve player and type query params
+      (function updateTagStatsLink() {
+        const params = new URLSearchParams(window.location.search);
+        const player = params.get('player');
+        const type = params.get('type');
+        if (!player && !type) return;
+
+        const tagLink = document.querySelector('.tagstats-link');
+        if (tagLink) {
+          const url = new URL(tagLink.href, window.location.origin);
+          url.searchParams.set('player', player);
+          url.searchParams.set('type', type);
+          tagLink.href = url.toString();
+        }
+      })();
+
+      const img = document.getElementById('player-photo');
+      const playerNameEl = document.getElementById('player-name');
+      const headerRow = document.getElementById('stats-headers');
+      const tbody = document.getElementById('stats-body');
+
+      // player names used in the page title
+      const playerNames = {
+        ohtansh01: "Shohei Ohtani",
+        acunaro01: "Ronald Acuña Jr.",
+        martipe02: "Pedro Martínez",
+        riverma01: "Mariano Rivera",
+        griffke02: "Ken Griffey Jr.",
+        maddugr01: "Greg Maddux",
+        jonesch06: "Chipper Jones",
+        poseybu01: "Buster Posey",
+        bondsba01: "Barry Bonds",
+        pujolal01: "Albert Pujols"
+      };
+
+      // player team colors used for page colors
+      const playerTeamColors = {
+        ohtansh01: "#005A9C",
+        acunaro01: "#CE1141",
+        martipe02: "#BD3039",
+        riverma01: "#003087",
+        griffke02: "#005DAA",
+        maddugr01: "#0E3386",
+        jonesch06: "#CE1141",
+        poseybu01: "#FD5A1E",
+        bondsba01: "#FD5A1E",
+        pujolal01: "#C41E3A"
+      };
+
+      document.documentElement.style.setProperty('--team-color', playerTeamColors[player] || '#ff2d2d');
+      playerNameEl.textContent = playerNames[player] || "Unknown Player";
+
+      // add a toggle link for shohei's batting and pitching pages
+      if (player === "ohtansh01") {
+        const link = document.createElement('a');
+        link.className = 'two-way-link';
+
+        const nextType = (type === "pitching") ? "batting" : "pitching";
+        link.href = `${location.pathname}?player=${player}&type=${nextType}`;
+        link.textContent = nextType === "pitching" ? "View Pitching Stats" : "View Batting Stats";
+
+        const highlightsEl = document.querySelector('.player-highlights');
+        highlightsEl.insertAdjacentElement('afterend', link);
+      }
+
+      // player headshot images
+      const base = 'https://hackberrylab.com/pink/tchilders/tagStats/images/headshots/';
+      const headshots = {
+        ohtansh01: 'shoheiOhtani.png',
+        acunaro01: 'ronaldAcunaJr.png',
+        martipe02: 'pedroMartinez.png',
+        riverma01: 'marianoRivera.png',
+        griffke02: 'kenGriffeyJr.png',
+        maddugr01: 'gregMaddux.png',
+        jonesch06: 'chipperJones.png',
+        poseybu01: 'busterPosey.png',
+        bondsba01: 'barryBonds.png',
+        pujolal01: 'albertPujols.png'
+      };
+
+      img.src = (player && headshots[player]) ? (base + headshots[player]) : '';
+
+      // bio text for each player
+      const playerBios = {
+        ohtansh01: "Shohei Ohtani is one of the most unique talents in baseball history, excelling as both an elite pitcher and power hitter. The Japanese superstar has won multiple MVP awards while starring for the Los Angeles Angels and now the Dodgers. His rare two-way dominance has drawn comparisons to the baseball legend Babe Ruth.",
+        acunaro01: "Ronald Acuña Jr. is a dynamic outfielder for the Atlanta Braves known for his speed, power, and electrifying play. He became the first player in MLB history to record a 40-home run, 70-stolen base season in 2023. Acuña won the National League MVP that same year.",
+        martipe02: "Pedro Martínez was one of the most dominant pitchers of the late 1990s and early 2000s. A three-time Cy Young Award winner, he led the Boston Red Sox to a World Series championship in 2004. Martínez was inducted into the Baseball Hall of Fame in 2015.",
+        riverma01: "Mariano Rivera is widely considered the greatest closer in MLB history. The longtime New York Yankees reliever recorded a record 652 career saves and helped lead the team to five World Series titles. Rivera became the first player ever elected unanimously to the Hall of Fame in 2019.",
+        griffke02: "Ken Griffey Jr. was one of the most beloved players of his generation, known for his smooth swing and incredible defensive ability. The 13-time All-Star hit 630 career home runs during his Hall of Fame career. Griffey was inducted into Cooperstown in 2016 with one of the highest vote percentages ever.",
+        maddugr01: "Greg Maddux was a master of control and strategy on the mound, winning four consecutive Cy Young Awards from 1992–1995. The longtime Atlanta Braves ace finished his career with 355 wins and over 3,300 strikeouts. Maddux was inducted into the Hall of Fame in 2014.",
+        jonesch06: "Chipper Jones spent his entire 19-year MLB career with the Atlanta Braves. The switch-hitting third baseman won the 1999 National League MVP and was a key part of the Braves’ long run of division titles and 1995 World Series championship. Jones was inducted into the Hall of Fame in 2018.",
+        poseybu01: "Buster Posey was the cornerstone catcher for the San Francisco Giants during their championship run in the 2010s. He won the 2012 National League MVP and helped lead the Giants to three World Series titles. Posey was widely respected for his leadership and defensive skill.",
+        bondsba01: "Barry Bonds is widely regarded as one of the most dominant hitters in baseball history. He holds the MLB records for career home runs (762) and single-season home runs (73). Bonds won seven National League MVP awards during his career.",
+        pujolal01: "Albert Pujols is one of the greatest power hitters in MLB history. The three-time MVP hit 703 career home runs and won two World Series titles with the St. Louis Cardinals. Pujols was a model of consistency throughout his 22-year career."
+      };
+
+      document.getElementById('bio-text').textContent = playerBios[player] || "Bio not available.";
+
+      // highlight video links - Ohtani has two seperate videos for pitching and batting.
+      const playerHighlightLinks = {
+        ohtansh01: {
+          batting: "https://www.youtube.com/watch?v=3_gDAF2GzCs",
+          pitching: "https://www.youtube.com/watch?v=A9ZXeiIzihE"
+        },
+        acunaro01: {
+          batting: "https://www.youtube.com/watch?v=yydvPGvOpcY"
+        },
+        martipe02: {
+          pitching: "https://www.youtube.com/watch?v=MC0mRvc-mZE"
+        },
+        riverma01: {
+          pitching: "https://www.youtube.com/watch?v=U3suugFqiH0"
+        },
+        griffke02: {
+          batting: "https://www.youtube.com/watch?v=kVamoUJ4hw0"
+        },
+        maddugr01: {
+          pitching: "https://www.youtube.com/watch?v=h7E2AQ-zogc"
+        },
+        jonesch06: {
+          batting: "https://www.youtube.com/watch?v=PJM5cvW0tjQ"
+        },
+        poseybu01: {
+          batting: "https://www.youtube.com/watch?v=NgJ8KpIArOk"
+        },
+        bondsba01: {
+          batting: "https://www.youtube.com/watch?v=j3EHr90pkew"
+        },
+        pujolal01: {
+          batting: "https://www.youtube.com/watch?v=Q01cFfjbBYM"
+        }
+      };
+
+      const profileIcon = document.getElementById('profile-icon');
+
+      // load the user's favorite team logo into the profile icon
+      async function loadProfileIcon() {
+        try {
+          const res = await fetch('../api/profile_get.php', { cache: 'no-store' });
+          if (!res.ok) return;
+
+          const data = await res.json();
+          const rawTeam = data.user?.favTeam;
+
+          const key = (rawTeam || '')
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, ' ');
+
+          const teamLogos = {
+            "arizona diamondbacks": '../images/logos/diamondbacksLogo.jpg',
+            "chicago white sox": '../images/logos/whitesoxLogo.png',
+            "new york yankees": '../images/logos/yankeesLogo.png',
+            "los angeles dodgers": '../images/logos/dodgersLogo.png',
+            "minnesota twins": '../images/logos/twinsLogo.png',
+            "detroit tigers": '../images/logos/tigersLogo.png',
+            "kansas city royals": '../images/logos/royalsLogo.png',
+            "colorado rockies": '../images/logos/rockiesLogo.png',
+            "boston red sox": '../images/logos/redsoxLogo.png',
+            "cincinnati reds": '../images/logos/redsLogo.png',
+            "tampa bay rays": '../images/logos/raysLogo.png',
+            "texas rangers": '../images/logos/rangersLogo.png',
+            "pittsburgh pirates": '../images/logos/piratesLogo.png',
+            "philadelphia phillies": '../images/logos/philliesLogo.png',
+            "san diego padres": '../images/logos/padresLogo.png',
+            "baltimore orioles": '../images/logos/oriolesLogo.png',
+            "washington nationals": '../images/logos/nationalsLogo.png',
+            "new york mets": '../images/logos/metsLogo.png',
+            "miami marlins": '../images/logos/marlinsLogo.png',
+            "seattle mariners": '../images/logos/marinersLogo.png',
+            "cleveland guardians": '../images/logos/guardiansLogo.png',
+            "san francisco giants": '../images/logos/giantsLogo.png',
+            "chicago cubs": '../images/logos/cubsLogo.png',
+            "st. louis cardinals": '../images/logos/cardinalsLogo.png',
+            "milwaukee brewers": '../images/logos/brewersLogo.png',
+            "atlanta braves": '../images/logos/bravesLogo.png',
+            "toronto blue jays": '../images/logos/bluejaysLogo.png',
+            "oakland athletics": '../images/logos/athleticsLogo.png',
+            "houston astros": '../images/logos/astrosLogo.png',
+            "los angeles angels": '../images/logos/angelsLogo.png'
+          };
+
+          profileIcon.src = teamLogos[key] || "../images/logos/default.png";
+        } catch (err) {
+          console.error('profile_get error:', err);
+          profileIcon.src = "../images/logos/default.png";
+        }
+      }
+
+      loadProfileIcon();
+      window.addEventListener('pageshow', loadProfileIcon);
+
+      const iframe = document.getElementById('highlights-iframe');
+      const highlightUrl =
+        playerHighlightLinks[player]?.[type] ||
+        playerHighlightLinks[player]?.batting ||
+        playerHighlightLinks[player]?.pitching;
+
+      const videoWrap = document.querySelector('.video-wrap');
+
+      // explanations for radar chart categories
+      const categoryExplanations = {
+        batting: {
+          "Power": "Based on the player's per season averages of Home Runs, Doubles, and RBIs.",
+          "Contact": "Based on the player's batting average.",
+          "Discipline": "Based on the player's per season averages of Walks and Strikeouts.",
+          "Speed": "Based on the player's per season averages of Stolen Bases, Runs, and Triples, minus Caught Stealings.",
+          "Durability": "Based on the player's average 'At Bats' per season."
+        },
+        pitching: {
+          "Strikeout Ability": "Based on the player's strikeouts per 9 innings pitched.",
+          "Control": "Based on the player's walks allowed per 9 innings pitched.",
+          "Run Prevention": "Based on the player's ERA.",
+          "Durability": "Based on the player's average innings pitched per season.",
+          "Dominance": "Based on the player's strikeout-to-walk ratio."
+        }
+      };
+
+      // lazy load the highlight video once the tab is opened
+      function loadHighlights() {
+        if (highlightsLoaded) return;
+        if (highlightUrl && iframe) {
+          if (videoWrap) videoWrap.classList.remove('is-loaded');
+
+          iframe.onload = () => {
+            if (videoWrap) videoWrap.classList.add('is-loaded');
+          };
+
+          const embedUrl = highlightUrl
+            .replace('watch?v=', 'embed/')
+            .replace('youtu.be/', 'www.youtube.com/embed/');
+          iframe.src = embedUrl;
+        }
+        highlightsLoaded = true;
+      }
+
+      // render charts when data is ready and the chart tab is opened
+      function ensureCharts() {
+        if (chartsReady) {
+          requestAnimationFrame(() => {
+            if (radarChart) radarChart.resize();
+            if (statsChart) statsChart.resize();
+          });
+          return;
+        }
+        if (!statsData || !radarData) {
+          chartsPending = true;
+          return;
+        }
+        renderCharts(statsData, radarData);
+        chartsReady = true;
+        chartsPending = false;
+        requestAnimationFrame(() => {
+          if (radarChart) radarChart.resize();
+          if (statsChart) statsChart.resize();
+        });
+      }
+
+      // build the radar chart and line chart
+      function renderCharts(data, radarData) {
+        const seasons = Math.max(radarData.length, 1);
+        const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+        const to100 = (value, min, max) => clamp(((value - min) / (max - min)) * 100, 0, 100);
+
+        const radarCtx = document.getElementById('radar-chart').getContext('2d');
+        let radarLabels = [];
+        let radarValues = [];
+
+        if (type === "batting") {
+          const totals = {
+            HR: radarData.reduce((a, b) => a + Number(b.HR || 0), 0),
+            "2B": radarData.reduce((a, b) => a + Number(b["2B"] || 0), 0),
+            RBI: radarData.reduce((a, b) => a + Number(b.RBI || 0), 0),
+            H: radarData.reduce((a, b) => a + Number(b.H || 0), 0),
+            BB: radarData.reduce((a, b) => a + Number(b.BB || 0), 0),
+            SB: radarData.reduce((a, b) => a + Number(b.SB || 0), 0),
+            AB: radarData.reduce((a, b) => a + Number(b.AB || 0), 0),
+            R: radarData.reduce((a, b) => a + Number(b.R || 0), 0),
+            "3B": radarData.reduce((a, b) => a + Number(b["3B"] || 0), 0),
+            SO: radarData.reduce((a, b) => a + Number(b.SO || 0), 0),
+            CS: radarData.reduce((a, b) => a + Number(b.CS || 0), 0)
+          };
+
+          const powerHR = to100(totals.HR / seasons, 0, 72);
+          const power2B = to100(totals["2B"] / seasons, 0, 50);
+          const powerRBI = to100(totals.RBI / seasons, 0, 140);
+          const power = (0.8 * powerHR) + (0.5 * power2B) + (0.5 * powerRBI);
+
+          const speedSB = to100(totals.SB / seasons, 0, 75);
+          const speedRuns = to100(totals.R / seasons, 0, 150);
+          const speed3B = to100(totals["3B"] / seasons, 0, 10);
+          const speedCS = to100(totals.CS / seasons, 0, 20);
+          const speed = (0.9 * speedSB) - (0.3 * speedCS) + (0.6 * speedRuns) + (0.8 * speed3B);
+
+          const disciplineBB = to100(totals.BB / seasons, 0, 100);
+          const disciplineSO = 100 - to100(totals.SO / seasons, 0, 200);
+          const discipline = (0.8 * disciplineBB) + (0.3 * disciplineSO);
+
+          const contactH = to100(totals.H / Math.max(totals.AB, 1), 0.200, 0.300);
+
+          radarLabels = ["Power", "Contact", "Discipline", "Speed", "Durability"];
+          radarValues = [
+            power,
+            contactH,
+            discipline,
+            speed,
+            to100(totals.AB / seasons, 200, 600)
+          ];
+        } else {
+          const totals = {
+            SO: radarData.reduce((a, b) => a + Number(b.SO || 0), 0),
+            BB: radarData.reduce((a, b) => a + Number(b.BB || 0), 0),
+            G: radarData.reduce((a, b) => a + Number(b.G || 0), 0),
+            ERA: radarData.reduce((a, b) => a + Number(b.ERA || 0), 0),
+            IPouts: radarData.reduce((a, b) => a + Number(b.IPouts || 0), 0)
+          };
+
+          const IP = Math.max(totals.IPouts / 3, 1);
+
+          const kPer9 = (totals.SO / IP) * 9;
+          const bbPer9 = (totals.BB / IP) * 9;
+          const avgERA = totals.ERA / seasons;
+          const ipPerSeason = IP / seasons;
+          const kPerBB = totals.SO / Math.max(totals.BB, 1);
+
+          const isMariano = player === "riverma01";
+          const durability = isMariano ? to100(ipPerSeason, 15, 70) : to100(ipPerSeason, 30, 220);
+
+          radarLabels = ["Strikeout Ability", "Control", "Run Prevention", "Durability", "Dominance"];
+          radarValues = [
+            to100(kPer9, 4, 8),
+            100 - to100(bbPer9, 1, 10),
+            100 - to100(avgERA, 1.5, 15),
+            durability,
+            to100(kPerBB, 1, 4)
+          ];
+        }
+
+        if (radarChart) radarChart.destroy();
+        radarChart = new Chart(radarCtx, {
+          type: "radar",
+          data: {
+            labels: radarLabels,
+            datasets: [{
+              label: "Skill Profile",
+              data: radarValues,
+              backgroundColor: "rgba(255,99,132,0.2)",
+              borderColor: playerTeamColors[player] || "#ff2d2d",
+              pointBackgroundColor: playerTeamColors[player] || "#ff2d2d",
+              pointRadius: 8
+            }]
+          },
+          options: {
+            onClick: (evt, elements) => {
+              if (elements.length > 0) {
+                const index = elements[0].index;
+                const label = radarLabels[index];
+                const explanations = categoryExplanations[type];
+                showCategoryModal(label, explanations[label]);
+              }
+            },
+            plugins: {
+              legend: {
+                labels: { color: "white" }
+              }
+            },
+            scales: {
+              r: {
+                min: 0,
+                max: 100,
+                ticks: {
+                  stepSize: 20,
+                  color: "rgba(255,255,255,0.75)",
+                  backdropColor: "transparent"
+                },
+                angleLines: { color: "rgba(255,255,255,0.15)" },
+                grid: { color: "rgba(255,255,255,0.15)" },
+                pointLabels: { color: "white" }
+              }
+            }
+          }
+        });
+
+        // show a popup explaining the clicked radar category
+        function showCategoryModal(category, explanation) {
+          const modal = document.getElementById('category-info-modal');
+          document.getElementById('category-title').textContent = category;
+          document.getElementById('category-explanation').textContent = explanation;
+          modal.hidden = false;
+          document.body.classList.add('modal-open');
+        }
+
+        const ctx = document.getElementById('stats-chart').getContext('2d');
+        const labels = data.map(d => d.yearID);
+        const values = data.map(d => type === 'batting' ? Number(d.HR) : Number(d.ERA));
+
+        if (statsChart) statsChart.destroy();
+        statsChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              label: type === 'batting' ? 'HR' : 'ERA',
+              data: values,
+              borderColor: playerTeamColors[player] || '#ff2d2d',
+              backgroundColor: 'rgba(255,0,0,0.2)',
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                labels: {
+                  color: "white",
+                  font: { size: 14 }
+                }
+              }
+            },
+            scales: {
+              x: {
+                ticks: { color: "white" },
+                grid: { color: "rgba(255,255,255,0.1)" }
+              },
+              y: {
+                ticks: { color: "white" },
+                grid: { color: "rgba(255,255,255,0.1)" }
+              }
+            }
+          }
+        });
+      }
+
+      // player achievements shown under the player name
+      const playerHighlights = {
+        ohtansh01: ["4x MVP", "2018 Rookie of the Year", "50/50 Club", "Hank Aaron Awards: 3"],
+        acunaro01: ["1x MVP", "2018 Rookie of the Year", "40/70 Club", "Hank Aaron Awards: 1"],
+        martipe02: ["Hall of Fame", "3x Cy Young", "1999 Triple Crown", "Shutouts: 17"],
+        riverma01: ["Hall of Fame", "13x All-Star", "Career Saves Record", "WS MVP: 1"],
+        griffke02: ["Hall of Fame", "Gold Gloves: 10", "1997 MVP", "7x Silver Slugger"],
+        maddugr01: ["Hall of Fame", "4x Cy Young", "Gold Gloves: 18", "Shutouts: 35"],
+        jonesch06: ["Hall of Fame", "8x Silver Slugger", "1999 MVP", "8x All-Star"],
+        poseybu01: ["1x MVP", "2010 Rookie of the Year", "5x Silver Slugger", "WS Titles: 3"],
+        bondsba01: ["7x MVP", "Hank Aaron Awards: 3", "12x Silver Slugger", "Gold Gloves: 8"],
+        pujolal01: ["3x MVP", "2001 Rookie of the Year", "11x All-Star", "6x Silver Slugger"]
+      };
+
+      const highlights = playerHighlights[player] || [];
+      document.getElementById("stat1").textContent = highlights[0] || "";
+      document.getElementById("stat2").textContent = highlights[1] || "";
+      document.getElementById("stat3").textContent = highlights[2] || "";
+      document.getElementById("stat4").textContent = highlights[3] || "";
+
+      // manually selected best season for row highlighting
+      const bestSeasonByPlayer = {
+        ohtansh01: { batting: 2024, pitching: 2022 },
+        acunaro01: { batting: 2023 },
+        martipe02: { pitching: 1999 },
+        riverma01: { pitching: 2005 },
+        griffke02: { batting: 1997 },
+        maddugr01: { pitching: 1995 },
+        jonesch06: { batting: 1999 },
+        bondsba01: { batting: 2001 },
+        pujolal01: { batting: 2009 },
+        poseybu01: { batting: 2012 }
+      };
+
+      // seasons excluded from radar calculations usually due to injury or limited playing time - this is to prevent outlier seasons from skewing the radar chart too much
+      const radarExcludeSeasons = {
+        ohtansh01: { pitching: [2020], batting: [2020] },
+        maddugr01: { pitching: [1986, 2008] },
+        jonesch06: { batting: [1993] },
+        acunaro01: { batting: [2020, 2024, 2021] },
+        riverma01: { pitching: [1995, 2012] },
+        griffke02: { batting: [2010, 2008, 2002] },
+        martipe02: { pitching: [1992, 2007, 2009] },
+        bondsba01: { batting: [2005] },
+        poseybu01: { batting: [2009, 2011] },
+      };
+
+      const bestSeason = bestSeasonByPlayer[player]?.[type];
+
+      // table columns for each stat type
+      const headersByType = {
+        batting: ['yearID', 'teamID', 'lgID', 'AB', 'R', 'H', '2B', '3B', 'HR', 'RBI', 'SB', 'CS', 'BB', 'SO'],
+        pitching: ['yearID', 'teamID', 'lgID', 'W', 'L', 'G', 'GS', 'CG', 'SHO', 'SV', 'H', 'ER', 'HR', 'BB', 'SO', 'BAOpp', 'ERA']
+      };
+
+      // labels for table headers
+      const headerLabels = {
+        yearID: 'Year',
+        teamID: 'Team',
+        lgID: 'League'
+      };
+
+      // load table data and prepare chart data
+      if (player && type && headersByType[type]) {
+        headerRow.innerHTML = '';
+        headersByType[type].forEach(col => {
+          const th = document.createElement('th');
+          th.textContent = headerLabels[col] || col;
+          headerRow.appendChild(th);
+        });
+
+        fetch(`../api/getData.php?player=${player}&type=${type}`)
+          .then(res => res.json())
+          .then(data => {
+            tbody.innerHTML = '';
+
+            const excludeYears = radarExcludeSeasons[player]?.[type] || [];
+            radarData = data.filter(r => !excludeYears.includes(Number(r.yearID)));
+            statsData = data;
+
+            const statSubtitle = document.getElementById('stat-type-subtitle');
+
+            // only ohtani gets the batting/pitching subtitle because he has both pages
+            if (player == "ohtansh01") {
+              if (type == 'pitching') {
+                statSubtitle.textContent = "Now Viewing Pitching Stats";
+              } else if (type == 'batting') {
+                statSubtitle.textContent = "Now Viewing Batting Stats";
+              }
+            }
+
+            // build each season row
+            data.forEach(row => {
+              const tr = document.createElement('tr');
+
+              if (Number(row.yearID) === bestSeason) {
+                tr.classList.add('best-season');
+              }
+
+              headersByType[type].forEach(col => {
+                const td = document.createElement('td');
+                td.textContent = row[col];
+                tr.appendChild(td);
+              });
+              tbody.appendChild(tr);
+            });
+
+            // add totals row at the bottom
+            const avgColumns = new Set(['ERA', 'BAOpp']);
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'totals-row';
+
+            headersByType[type].forEach(col => {
+              const td = document.createElement('td');
+
+              if (col === 'yearID') {
+                td.textContent = 'Totals:';
+              } else if (col === 'teamID' || col === 'lgID') {
+                td.textContent = ' ';
+              } else {
+                const nums = data.map(r => Number(r[col])).filter(n => !Number.isNaN(n));
+
+                if (!nums.length) {
+                  td.textContent = '-';
+                } else if (avgColumns.has(col)) {
+                  const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+                  td.textContent = (col === 'BAOpp') ? avg.toFixed(3) : avg.toFixed(2);
+                } else {
+                  const sum = nums.reduce((a, b) => a + b, 0);
+                  td.textContent = Number.isInteger(sum) ? String(sum) : sum.toFixed(2);
+                }
+              }
+
+              totalRow.appendChild(td);
+            });
+
+            tbody.appendChild(totalRow);
+
+            // render charts if the chart tab is already open
+            if (chartsPending) {
+              renderCharts(statsData, radarData);
+              chartsReady = true;
+              chartsPending = false;
+            }
+          })
+          .catch(err => {
+            console.error('Error loading stats:', err);
+          });
+      }
+    })();
+  </script>
+</body>
+
+</html>

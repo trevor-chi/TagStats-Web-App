@@ -1,0 +1,180 @@
+/* ==================== FONTS ==================== */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Oswald:wght@700&family=Playfair+Display:wght@700&display=swap');
+
+/* ==================== ROOT / VIEWPORT LOCK ==================== */
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;          /* prevent page scroll */
+    overscroll-behavior: none; /* prevent bounce/pull-to-scroll */
+}
+
+/* ==================== BODY ==================== */
+body {
+    min-height: 100vh;
+    min-height: 100dvh; /* mobile-safe viewport height */
+    font-family: 'Roboto', sans-serif;
+    color: white;
+    position: fixed;    /* lock to viewport */
+    inset: 0;
+    overflow: hidden;
+    overflow-x: hidden;
+
+    /* Flexbox for vertical & horizontal centering */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Dark overlay for fullscreen player images */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.95));
+    z-index: 0;
+}
+
+/* ==================== HEADINGS ==================== */
+h1, h2, .fs-1, .fs-2 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+}
+
+/* TagStats title (same as home page) */
+.brand-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    font-style: italic;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+    z-index: 1;
+}
+
+/* ==================== PLAYER BACKGROUND & UNLOCK CARD ==================== */
+
+/* Fullscreen player image */
+.bg-player-img {
+    position: fixed;  /* fixed so it can't expand scroll area */
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 100dvh;
+    object-fit: cover;
+    opacity: 0.3;
+    z-index: 0;
+    transform: translate(-50%, 0%);
+    pointer-events: none;
+}
+
+/* Content wrapper for cards/text */
+.content-wrapper {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+}
+
+/* Unlock card */
+.unlock-card {
+    background: rgba(17, 17, 17, 0.85);
+    border-radius: 20px;
+    padding: 40px 20px;
+    border: 2px solid var(--team-color);
+    margin-bottom: 1.5rem;
+}
+
+/* Player name in card */
+.player-name {
+    font-size: 2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+/* Activated text */
+.activated-text {
+    font-weight: 700;
+    margin-top: 0.5rem;
+    color: var(--team-color);
+}
+
+/* Unlock button */
+.unlock-btn {
+    border: none;
+    font-weight: 800;
+    font-size: 1.1rem;
+    padding: 14px;
+    border-radius: 50px;
+    width: 100%;
+    margin-bottom: 1rem;
+    background: var(--team-color);
+    color: white;
+}
+
+/* Secondary links */
+.secondary-link {
+    color: #bbb;
+}
+
+/* Registration page theme */
+.register-page {
+    min-height: 100dvh;
+    background: linear-gradient(to bottom, #0b0b0b, #141414);
+    color: #fff;
+    overflow-y: auto;   /* allow scroll on long form pages */
+    position: relative;
+}
+
+.register-page .container {
+    max-width: 760px;
+}
+
+.register-page .card {
+    background: rgba(17, 17, 17, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.register-page .card-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.register-page .form-control,
+.register-page .form-select {
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.register-page .form-control:focus,
+.register-page .form-select:focus {
+    border-color: var(--team-color, #ff2d2d);
+    box-shadow: 0 0 0 0.2rem rgba(255, 45, 45, 0.2);
+}
+
+.register-page .btn-primary {
+    background: var(--team-color, #ff2d2d);
+    border: none;
+    font-weight: 700;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .unlock-card {
+        padding: 30px 15px;
+    }
+
+    .player-name {
+        font-size: 1.7rem;
+    }
+
+    .unlock-btn {
+        font-size: 1rem;
+        padding: 12px;
+    }
+}

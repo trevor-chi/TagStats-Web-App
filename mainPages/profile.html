@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>My Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --panel-2: #1f2430;
+      --accent: #e53935;
+      --accent-rgb: 229 57 53;
+      --text: #f5f7fa;
+      --muted: #b7c0d1;
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      --radius: 16px;
+      --team-bg: none;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(229, 57, 53, 0.08), transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(66, 133, 244, 0.06), transparent 45%),
+        var(--team-bg),
+        var(--bg);
+      background-size: auto, auto, cover, auto;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: var(--text);
+    }
+
+    .page {
+      height: 100dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 18px 64px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 34px);
+      letter-spacing: 0.2px;
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(15, 17, 21, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+      font-weight: 800;
+    }
+    
+    .card,
+    .auth-card {
+      background: linear-gradient(145deg, rgba(23, 26, 33, 0.78), rgba(31, 36, 48, 0.5));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .card {
+      padding: 20px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(4px);
+    }
+
+    .card h2 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .save-btn {
+      height: 48px;
+      width: 80%;
+      padding: 0 18px;
+      border-radius: 12px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .save-btn:focus,
+    .save-btn:focus-visible,
+    .save-btn:active {
+      background: var(--accent);
+      box-shadow: none;
+      outline: none;
+    }
+
+    .status {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .form-floating>.form-select {
+      background-color: rgba(0, 0, 0, 0.35);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      height: 58px;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .form-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 0.2rem rgba(var(--accent-rgb), 0.2);
+    }
+
+    .collection-card {
+      padding-bottom: 10px;
+    }
+
+    .collection-hero {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .ring {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent) 0deg, rgba(255, 255, 255, 0.08) 0deg);
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.35);
+    }
+
+    .ring-inner {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--panel);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .ring-value {
+      color: #fff;
+      font-weight: 900;
+      font-size: x-large;
+    }
+
+    .stat-line,
+    .stat-line span,
+    .stat-line strong {
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .stat-line {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .collection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 5px;
+    }
+
+    .collection-tile {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      font-size: 12px;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .collection-tile.collected {
+      color: var(--text);
+      border-color: rgba(var(--accent-rgb), 0.35);
+      box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.25);
+    }
+
+    .collection-tile.collected:hover {
+      transform: translateY(-2px);
+      transition: transform 0.15s ease;
+    }
+
+    .collection-tile img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+
+    .collection-tile.locked img {
+      filter: grayscale(1) brightness(0.6);
+    }
+
+    .collection-tile.locked::after {
+      content: "LOCKED";
+      position: absolute;
+      inset: 8px;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.45);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 1px;
+      border-radius: 8px;
+      opacity: 0.8;
+    }
+
+    .player-name {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .auth-card {
+      padding: 24px;
+      max-width: 520px;
+      margin: 40px auto 0;
+    }
+
+    .auth-card h2 {
+      margin: 0 0 8px 0;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .auth-card p {
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .auth-actions,
+    .bottom-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .auth-actions a {
+      padding: 10px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      border: 1px solid rgba(var(--accent-rgb), 0.5);
+      display: inline-block;
+    }
+
+    .site-footer {
+      color: rgba(255, 255, 255, 0.6);
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      background: none !important;
+      position: relative;
+      z-index: 10;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .site-footer .footer-link {
+      color: rgba(255, 255, 255, 0.6);
+      text-decoration: underline;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .site-footer .footer-link:hover {
+      text-decoration: underline;
+    }
+
+    #logoutbutton,
+    #backbutton {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+      padding: 10px 16px;
+      border-radius: 12px;
+    }
+
+    .bottom-buttons {
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <!-- page title -->
+    <div class="header">
+      <h1>Tag Stats Profile</h1>
+    </div>
+
+    <!-- favorite team form -->
+    <section class="card">
+      <h2>Update Favorite Team</h2>
+      <form id="favForm">
+        <div class="form-floating mb-3">
+          <select class="form-select" id="favTeam" name="favTeam" required>
+            <option value="Arizona Diamondbacks">Arizona Diamondbacks</option>
+            <option value="Atlanta Braves">Atlanta Braves</option>
+            <option value="Baltimore Orioles">Baltimore Orioles</option>
+            <option value="Boston Red Sox">Boston Red Sox</option>
+            <option value="Chicago Cubs">Chicago Cubs</option>
+            <option value="Chicago White Sox">Chicago White Sox</option>
+            <option value="Cincinnati Reds">Cincinnati Reds</option>
+            <option value="Cleveland Guardians">Cleveland Guardians</option>
+            <option value="Colorado Rockies">Colorado Rockies</option>
+            <option value="Detroit Tigers">Detroit Tigers</option>
+            <option value="Houston Astros">Houston Astros</option>
+            <option value="Kansas City Royals">Kansas City Royals</option>
+            <option value="Los Angeles Angels">Los Angeles Angels</option>
+            <option value="Los Angeles Dodgers">Los Angeles Dodgers</option>
+            <option value="Miami Marlins">Miami Marlins</option>
+            <option value="Milwaukee Brewers">Milwaukee Brewers</option>
+            <option value="Minnesota Twins">Minnesota Twins</option>
+            <option value="New York Mets">New York Mets</option>
+            <option value="New York Yankees">New York Yankees</option>
+            <option value="Oakland Athletics">Oakland Athletics</option>
+            <option value="Philadelphia Phillies">Philadelphia Phillies</option>
+            <option value="Pittsburgh Pirates">Pittsburgh Pirates</option>
+            <option value="San Diego Padres">San Diego Padres</option>
+            <option value="San Francisco Giants">San Francisco Giants</option>
+            <option value="Seattle Mariners">Seattle Mariners</option>
+            <option value="St. Louis Cardinals">St. Louis Cardinals</option>
+            <option value="Tampa Bay Rays">Tampa Bay Rays</option>
+            <option value="Texas Rangers">Texas Rangers</option>
+            <option value="Toronto Blue Jays">Toronto Blue Jays</option>
+            <option value="Washington Nationals">Washington Nationals</option>
+          </select>
+        </div>
+        <button class="save-btn" type="submit">Save</button>
+      </form>
+      <p id="favStatus" class="status"></p>
+    </section>
+
+    <!-- collection summary and player cards -->
+    <section class="card collection-card">
+      <h2>Collection Status</h2>
+      <div class="collection-hero">
+        <div class="ring" id="collectionRing">
+          <div class="ring-inner">
+            <div class="ring-value" id="collectionPct">0%</div>
+          </div>
+        </div>
+        <div class="collection-stats">
+          <div class="stat-line"><span>Collected:</span><strong id="collectedCount">0</strong></div>
+          <div class="stat-line"><span>Remaining:</span><strong id="remainingCount">0</strong></div>
+        </div>
+      </div>
+      <div class="collection-grid" id="collectionGrid"></div>
+    </section>
+
+    <!-- navigation buttons -->
+    <div class="bottom-buttons">
+      <button id="backbutton"> Back</button>
+      <button id="logoutbutton">Log Out</button>
+    </div>
+
+    <!-- footer link -->
+    <footer class="site-footer" id="siteFooter">
+      <a id="footerLink" href="../mainPages/about.html" class="footer-link">
+        Created By Trevor Childers - 2026
+      </a>
+    </footer>
+  </div>
+
+  <script>
+    // map of team name to background image
+    const TEAM_BG = {
+      "Arizona Diamondbacks": "../images/background/diamondbacksBackground.png",
+      "Atlanta Braves": "../images/background/bravesBackground.png",
+      "Baltimore Orioles": "../images/background/oriolesBackground.png",
+      "Boston Red Sox": "../images/background/redsoxBackground.png",
+      "Chicago Cubs": "../images/background/cubsBackground.png",
+      "Chicago White Sox": "../images/background/whitesoxBackground.png",
+      "Cincinnati Reds": "../images/background/redsBackground.png",
+      "Cleveland Guardians": "../images/background/guardiansBackground.png",
+      "Colorado Rockies": "../images/background/rockiesBackground.png",
+      "Detroit Tigers": "../images/background/tigersBackground.png",
+      "Houston Astros": "../images/background/astrosBackground.png",
+      "Kansas City Royals": "../images/background/royalsBackground.png",
+      "Los Angeles Angels": "../images/background/angelsBackground.png",
+      "Los Angeles Dodgers": "../images/background/dodgersBackground.png",
+      "Miami Marlins": "../images/background/marlinsBackground.png",
+      "Milwaukee Brewers": "../images/background/brewersBackground.png",
+      "Minnesota Twins": "../images/background/twinsBackground.png",
+      "New York Mets": "../images/background/metsBackground.png",
+      "New York Yankees": "../images/background/yankeesBackground.png",
+      "Oakland Athletics": "../images/background/athleticsBackground.png",
+      "Philadelphia Phillies": "../images/background/philliesBackground.png",
+      "Pittsburgh Pirates": "../images/background/piratesBackground.png",
+      "San Diego Padres": "../images/background/padresBackground.png",
+      "San Francisco Giants": "../images/background/giantsBackground.png",
+      "Seattle Mariners": "../images/background/marinersBackground.png",
+      "St. Louis Cardinals": "../images/background/cardinalsBackground.png",
+      "Tampa Bay Rays": "../images/background/raysBackground.png",
+      "Texas Rangers": "../images/background/rangersBackground.png",
+      "Toronto Blue Jays": "../images/background/bluejaysBackground.png",
+      "Washington Nationals": "../images/background/nationalsBackground.png"
+    };
+
+    // map of team name to accent color
+    const TEAM_COLORS = {
+      "Arizona Diamondbacks": "#A71930",
+      "Atlanta Braves": "#CE1141",
+      "Baltimore Orioles": "#DF4601",
+      "Boston Red Sox": "#BD3039",
+      "Chicago Cubs": "#0E3386",
+      "Chicago White Sox": "#C4CED4",
+      "Cincinnati Reds": "#C6011F",
+      "Cleveland Guardians": "#E50022",
+      "Colorado Rockies": "#33006F",
+      "Detroit Tigers": "#0C2340",
+      "Houston Astros": "#EB6E1F",
+      "Kansas City Royals": "#004687",
+      "Los Angeles Angels": "#BA0021",
+      "Los Angeles Dodgers": "#005A9C",
+      "Miami Marlins": "#00A3E0",
+      "Milwaukee Brewers": "#FFC52F",
+      "Minnesota Twins": "#D31145",
+      "New York Mets": "#FF5910",
+      "New York Yankees": "#003087",
+      "Oakland Athletics": "#003831",
+      "Philadelphia Phillies": "#E81828",
+      "Pittsburgh Pirates": "#FDB827",
+      "San Diego Padres": "#FFC425",
+      "San Francisco Giants": "#FD5A1E",
+      "Seattle Mariners": "#005C5C",
+      "St. Louis Cardinals": "#C41E3A",
+      "Tampa Bay Rays": "#092C5C",
+      "Texas Rangers": "#C0111F",
+      "Toronto Blue Jays": "#134A8E",
+      "Washington Nationals": "#AB0003"
+    };
+
+    // player image folder
+    const HEADSHOT_BASE = "../images/headshots/";
+
+    // map of player id to headshot filename
+    const headshots = {
+      ohtansh01: "shoheiOhtani.png",
+      acunaro01: "ronaldAcunaJr.png",
+      martipe02: "pedroMartinez.png",
+      riverma01: "marianoRivera.png",
+      griffke02: "kenGriffeyJr.png",
+      maddugr01: "gregMaddux.png",
+      jonesch06: "chipperJones.png",
+      poseybu01: "busterPosey.png",
+      bondsba01: "barryBonds.png",
+      pujolal01: "albertPujols.png"
+    };
+
+    // map of player ids to display names for the collection grid
+    const playerNames = {
+      ohtansh01: "Shohei Ohtani",
+      acunaro01: "Ronald Acuña Jr.",
+      martipe02: "Pedro Martinez",
+      riverma01: "Mariano Rivera",
+      griffke02: "Ken Griffey Jr.",
+      maddugr01: "Greg Maddux",
+      jonesch06: "Chipper Jones",
+      poseybu01: "Buster Posey",
+      bondsba01: "Barry Bonds",
+      pujolal01: "Albert Pujols"
+    };
+
+    // map of player page urls for the player collection grid
+    const player_urls = {
+      ohtansh01: "playerPage.html?player=ohtansh01&type=batting",
+      acunaro01: "playerPage.html?player=acunaro01&type=batting",
+      martipe02: "playerPage.html?player=martipe02&type=pitching",
+      riverma01: "playerPage.html?player=riverma01&type=pitching",
+      griffke02: "playerPage.html?player=griffke02&type=batting",
+      maddugr01: "playerPage.html?player=maddugr01&type=pitching",
+      jonesch06: "playerPage.html?player=jonesch06&type=batting",
+      poseybu01: "playerPage.html?player=poseybu01&type=batting",
+      bondsba01: "playerPage.html?player=bondsba01&type=batting",
+      pujolal01: "playerPage.html?player=pujolal01&type=batting"
+    };
+
+    // map of player team colors
+    const player_team_colors = {
+      ohtansh01: "#005A9C",
+      acunaro01: "#CE1141",
+      martipe02: "#BD3039",
+      riverma01: "#003087",
+      griffke02: "#005DAA",
+      maddugr01: "#0E3386",
+      jonesch06: "#CE1141",
+      poseybu01: "#FD5A1E",
+      bondsba01: "#FD5A1E",
+      pujolal01: "#C41E3A"
+    };
+
+    // convert a hex color into rgb values
+    function hexToRgb(hex) {
+      const clean = hex.replace('#', '');
+      if (clean.length !== 6) return null;
+      const r = parseInt(clean.slice(0, 2), 16);
+      const g = parseInt(clean.slice(2, 4), 16);
+      const b = parseInt(clean.slice(4, 6), 16);
+      return `${r} ${g} ${b}`;
+    }
+
+    // update the color variables based on the selected team
+    function setTeamTheme(teamName) {
+      const hex = TEAM_COLORS[teamName];
+      if (!hex) {
+        document.documentElement.style.setProperty('--accent', '#e53935');
+        document.documentElement.style.setProperty('--accent-rgb', '229 57 53');
+        return;
+      }
+      document.documentElement.style.setProperty('--accent', hex);
+      const rgb = hexToRgb(hex);
+      if (rgb) {
+        document.documentElement.style.setProperty('--accent-rgb', rgb);
+      }
+    }
+
+    // update the large background image based on the selected team
+    function setTeamBackground(teamName) {
+      const url = TEAM_BG[teamName] || "../images/team-bg/default.jpg";
+      document.documentElement.style.setProperty('--team-bg', `url('${url}')`);
+    }
+
+    // load the signed-in user's profile and apply their saved team background and color
+    async function loadProfile() {
+      const res = await fetch('../api/profile_get.php');
+      if (!res.ok) {
+        const player = new URLSearchParams(location.search).get('player');
+        const hex = player_team_colors[player];
+        if (hex) {
+          document.documentElement.style.setProperty('--accent', hex);
+          const rgb = hexToRgb(hex);
+          if (rgb) document.documentElement.style.setProperty('--accent-rgb', rgb);
+        }
+
+        const qs = location.search || '';
+        document.body.innerHTML = `
+    <div class="page">
+      <div class="header">
+        <h1>Tag Stats Profile</h1>
+      </div>
+      <div class="auth-card">
+        <h2>Login or Create an Account to Continue</h2>
+        <p>This allows you to view your collection and update your profile.</p>
+        <div class="auth-actions">
+          <a href="../login/login.html${qs}">Log In</a>
+          <a href="../userRegistration/register.html${qs}">Create Account</a>
+        </div>
+      </div>
+    </div>
+  `;
+        return;
+      }
+
+      const data = await res.json();
+
+      if (data.user.favTeam) {
+        const select = document.getElementById('favTeam');
+        select.value = data.user.favTeam;
+        setTeamBackground(select.value);
+        setTeamTheme(select.value);
+      }
+    }
+
+    // keep query string values when going to the footer page
+    function preserveQueryParams() {
+      const qs = window.location.search;
+      if (!qs) return;
+
+      const footerLink = document.getElementById('footerLink');
+      if (footerLink) {
+        footerLink.href += qs;
+      }
+    }
+
+    preserveQueryParams();
+
+    // timer used to clear the update message after selecting a new fav team
+    let statusTimer = null;
+
+    // save the selected favorite team
+    document.getElementById('favForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const favTeam = document.getElementById('favTeam').value;
+
+      const body = new URLSearchParams();
+      body.append('favTeam', favTeam);
+
+      const res = await fetch('../api/profile_update.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
+
+      const status = document.getElementById('favStatus');
+      if (res.ok) {
+        status.textContent = 'Updated!';
+        setTeamBackground(favTeam);
+        setTeamTheme(favTeam);
+      } else {
+        const err = await res.json();
+        status.textContent = err.error || 'Update failed';
+      }
+
+      if (statusTimer) clearTimeout(statusTimer);
+      statusTimer = setTimeout(() => {
+        status.textContent = '';
+      }, 2500);
+    });
+
+    // load the user profile when the page opens
+    loadProfile();
+
+    // go back to the previous page when you click the back button
+    document.getElementById("backbutton").addEventListener('click', () => {
+      history.back();
+    });
+
+    const queryParams = new URLSearchParams(window.location.search);
+
+    // log out and keep the query params
+    document.getElementById("logoutbutton").addEventListener('click', () => {
+      fetch('../login/logout.php').then(() => {
+        window.location.href = '../login/login.html?' + queryParams.toString();
+      });
+    });
+
+    // load collection progress and build the player collection grid
+    async function loadCollection() {
+      const res = await fetch('../api/profile_get.php');
+      if (!res.ok) return;
+
+      const data = await res.json();
+      const collectedIds = new Set(data.collection || []);
+
+      const total = Object.keys(headshots).length;
+      const collected = collectedIds.size;
+      const remaining = Math.max(total - collected, 0);
+      const pct = total ? Math.round((collected / total) * 100) : 0;
+
+      document.getElementById('collectedCount').textContent = collected;
+      document.getElementById('remainingCount').textContent = remaining;
+      document.getElementById('collectionPct').textContent = `${pct}%`;
+
+      const ring = document.getElementById('collectionRing');
+      ring.style.background = `conic-gradient(var(--accent) ${pct * 3.6}deg, rgba(255,255,255,0.08) 0deg)`;
+
+      const grid = document.getElementById('collectionGrid');
+      grid.innerHTML = '';
+
+      Object.entries(headshots).forEach(([id, filename]) => {
+        const isCollected = collectedIds.has(id);
+
+        const tile = document.createElement(isCollected ? 'a' : 'div');
+        tile.className = `collection-tile ${isCollected ? 'collected' : 'locked'}`;
+
+        const url = player_urls[id];
+        if (isCollected && url) {
+          tile.href = url;
+          tile.setAttribute('aria-label', `View ${id}`);
+        }
+
+        const name = playerNames[id] || id;
+        tile.innerHTML = `<img src="${HEADSHOT_BASE + filename}" alt="${name}">
+                          <div class="player-name">${name}</div>`;
+
+        grid.appendChild(tile);
+      });
+    }
+
+    // load the collection grid when the page opens
+    loadCollection();
+  </script>
+</body>
+
+</html>

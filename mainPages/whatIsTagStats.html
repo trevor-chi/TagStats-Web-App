@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TagStats - What Is TagStats?</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/theme.css" rel="stylesheet">
+
+    <style>
+        html, body {
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: url('../images/background/stadiumBackground.jpg') center/cover no-repeat;
+            filter: brightness(1);
+            z-index: -1;
+        }
+
+        body {
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        main {
+            padding-bottom: 20px;
+        }
+
+        .brand-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-top: 20px;
+            letter-spacing: 2px;
+        }
+
+        /* card styling - matching about page sections */
+        section.bio, section.contact, .unlock-card {
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        section.bio h2, section.contact h2, .unlock-card h2 {
+            text-align: center;
+            color: var(--team-color, #ff2d2d);
+            margin-bottom: 15px;
+        }
+
+        section.bio p, section.contact p, .unlock-card p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .unlock-card h2, .info-tile h5 {
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--team-color, #ff2d2d);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .unlock-card h2+p {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 10px auto;
+            color: #e0e0e0;
+        }
+
+        .info-tile {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 15px 20px;
+            transition: 0.3s ease;
+            margin-bottom: 5px;
+        }
+
+        .info-tile:hover {
+            transform: translateY(-2px);
+            border-color: var(--team-color, #ff2d2d);
+        }
+
+        .unlock-btn {
+            display: inline-block;
+            background: var(--team-color, #ff2d2d);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .unlock-btn:hover {
+            opacity: 0.85;
+        }
+
+        .creator-link {
+            color: #ffffff;
+            text-decoration: underline;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .creator-link:hover {
+            color: var(--team-color, #ff2d2d);
+            text-decoration: none;
+        }
+
+        .site-footer {
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            background: none !important;
+            position: relative;
+            z-index: 10;
+        }
+
+        .site-footer .footer-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: underline;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .site-footer .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .unlock-card { padding: 15px 15px; }
+            .brand-title { font-size: 2rem; }
+            .unlock-card h2+p { max-width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="container">
+        <div class="brand-title">TAGSTATS</div>
+    </header>
+
+    <main class="container">
+
+        <!-- what is tagstats -->
+        <section class="row py-2">
+            <div class="col-12 unlock-card">
+                <h2>What Is <i>TagStats</i>?</h2>
+                <p><i>TagStats</i> brings your baseball cards to life. Using NFC technology, you can unlock player
+                    stats, digital content, and interactive experiences directly from your cards.</p>
+
+                <ul class="list-unstyled mt-2">
+                    <li class="mb-1"><strong>Digital Integration:</strong> Scan your NFC-enabled cards to access online
+                        stats and player pages.</li>
+                    <li class="mb-1"><strong>Collection Tracking:</strong> Make an account to keep track of your NFC
+                        card collection.</li>
+                    <li class="mb-1"><strong>Visualizations:</strong> Dive into player achievements with interactive
+                        data visualizations that bring stats to life.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- how it works -->
+        <section class="row py-2">
+            <div class="col-12 unlock-card">
+                <h2>How Do NFC Baseball Cards Work?</h2>
+                <p>Our NFC baseball cards are embedded with tiny chips that store digital information. Simply tap your
+                    card against an NFC-enabled device to be taken to that player's <i>TagStats</i> webpage!</p>
+
+                <div class="row mt-1">
+                    <div class="col-12 col-md-4 mb-2">
+                        <div class="info-tile text-center h-100">
+                            <h5>1. Tap to Scan</h5>
+                            <p>Use your phone's NFC reader to scan the card. No apps required!</p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4 mb-2">
+                        <div class="info-tile text-center h-100">
+                            <h5>2. Unlock Content</h5>
+                            <p>Access player stats, highlight videos, and exclusive digital collectibles.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4 mb-2">
+                        <div class="info-tile text-center h-100">
+                            <h5>3. Track Your Collection </h5>
+                            <p>Log your collection on <i>TagStats</i>!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="row py-2 text-center">
+            <div class="col-12 unlock-card">
+                <h2>Ready to Get Started?</h2>
+                <p>Join the NFC baseball card revolution today and start building your personal collection!</p>
+                <a href="../userRegistration/register.html" class="unlock-btn" id="createAccountBtn">Create Your Account!</a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="site-footer" id="siteFooter">
+        <a id="footerLink" href="../mainPages/about.html" class="footer-link">
+            Created By Trevor Childers - 2026
+        </a>
+    </footer>
+
+    <script>
+        // color map for players
+        const playerTeamColors = {
+            ohtansh01: "#005A9C", acunaro01: "#CE1141", martipe02: "#BD3039",
+            riverma01: "#003087", griffke02: "#005DAA", maddugr01: "#0E3386",
+            jonesch06: "#CE1141", poseybu01: "#FD5A1E", bondsba01: "#FD5A1E",
+            pujolal01: "#C41E3A"
+        };
+
+        // get current query params
+        const queryString = window.location.search;
+
+        // preserve query params on create account button click
+        const createAccountBtn = document.getElementById('createAccountBtn');
+        createAccountBtn.href += queryString;
+
+        // preserve query params on footer link click
+        const footerLink = document.getElementById('footerLink');
+        if (footerLink) footerLink.href += queryString;
+
+        // set team color from query params
+        const params = new URLSearchParams(queryString);
+        const player = params.get("player");
+        if (player && playerTeamColors[player]) {
+            document.documentElement.style.setProperty("--team-color", playerTeamColors[player]);
+        }
+    </script>
+
+</body>
+
+</html>
